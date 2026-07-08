@@ -1,0 +1,71 @@
+# .github/settings.yml
+#
+# Managed by the Probot Settings app:
+# https://github.com/apps/settings
+#
+# Changes to this file take effect when the Settings app is installed on the
+# repository and a commit is pushed (or a PR is merged) to the default branch.
+#
+# Install the app at:
+# https://github.com/apps/settings
+
+repository:
+  name: copilot-license-audit
+  description: >-
+    Read-only, stdlib-only Go CLI that audits GitHub Copilot Enterprise seats
+    across a GitHub Enterprise and reports on billing usage, premium
+    requests, AI credits, budgets, and Copilot metrics. Authenticates via
+    $GH_TOKEN/$GITHUB_TOKEN or the gh CLI; no API write calls are ever made.
+  homepage: ""
+  topics: github-copilot, cli, go, golang, license-management, billing, devops, github-enterprise, audit
+  private: false
+  has_issues: true
+  has_projects: false
+  has_wiki: false
+  has_downloads: false
+  default_branch: main
+
+  # Only squash merges are allowed to keep the history linear and clean.
+  allow_squash_merge: true
+  allow_merge_commit: false
+  allow_rebase_merge: false
+
+  # Delete head branches automatically after a PR is merged.
+  delete_branch_on_merge: true
+
+  # Allow GitHub to auto-merge PRs that satisfy all requirements.
+  allow_auto_merge: true
+
+# Branch protection for main.
+# Strategy: Option B — require PRs (for audit trail), but 0 required approvals
+# so a solo maintainer can merge their own PRs without a second reviewer.
+branches:
+  - name: main
+    protection:
+      # PRs are required but no approvals are needed (solo maintainer workflow).
+      required_pull_request_reviews:
+        required_approving_review_count: 0
+        dismiss_stale_reviews: false
+        require_code_owner_reviews: false
+
+      # Require the Go CI workflow (job name: "test", defined in
+      # .github/workflows/ci.yml — gofmt/vet/build/test) to pass before
+      # merging. strict: true also requires the branch to be up to date
+      # with main before the check can pass.
+      required_status_checks:
+        strict: true
+        contexts:
+          - test
+
+      # The admin (repo owner) is not forced to bypass protection rules.
+      enforce_admins: false
+
+      # Enforce a linear commit history (works with squash-merge-only setting).
+      required_linear_history: true
+
+      # Prevent force-pushes and accidental branch deletion.
+      allow_force_pushes: false
+      allow_deletions: false
+
+      # No push restrictions — the maintainer can push directly if needed.
+      restrictions: null

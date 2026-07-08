@@ -1,0 +1,21 @@
+version: 2
+updates:
+  # GitHub Actions used in .github/workflows/*.yml. All actions are pinned
+  # to commit SHAs (see each workflow); Dependabot opens a PR to bump the
+  # pin (with the version comment) when a new release is available.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+
+  # Go modules. This project is intentionally stdlib-only (no go.sum), so
+  # this ecosystem currently has nothing to update — kept enabled so it
+  # activates automatically the moment (if ever) a dependency is added.
+  - package-ecosystem: "gomod"
+    directory: "/"
+    schedule:
+      interval: "weekly"

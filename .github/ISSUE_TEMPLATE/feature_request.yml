@@ -1,0 +1,36 @@
+name: Feature request
+description: Suggest an idea for this tool
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for the suggestion! A couple of things worth knowing before
+        you file this (see [CONTRIBUTING.md](../../CONTRIBUTING.md)):
+
+        - The tool is intentionally **zero third-party dependencies** and
+          **strictly read-only** (GET-only against the GitHub API). Feature
+          requests that would require either are unlikely to be accepted
+          as-is, though we're happy to discuss alternatives.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem are you trying to solve?
+      description: What are you trying to do today that this tool doesn't support?
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: A new subcommand/flag, a change to existing output, etc.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any workarounds you're using today, or other approaches you considered.

@@ -1,0 +1,31 @@
+# Go binaries
+/copilot-license-audit
+/dist/
+
+# Go test / build cache (managed by the Go toolchain)
+*.test
+*.out
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+
+# Local data exports (e.g. ad-hoc spreadsheets while debugging billing data)
+*.csv
+
+# Downloaded Copilot metrics report files (produced by `metrics report --download`)
+*.parquet
+*.jsonl

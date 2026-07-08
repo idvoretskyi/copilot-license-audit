@@ -1,0 +1,87 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write # required to create the GitHub Release and upload assets
+
+jobs:
+  build:
+    name: Build (${{ matrix.goos }}/${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+          - goos: linux
+            goarch: arm64
+          - goos: darwin
+            goarch: amd64
+          - goos: darwin
+            goarch: arm64
+          - goos: windows
+            goarch: amd64
+    steps:
+      - name: Check out code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
+        with:
+          go-version-file: go.mod
+          cache: false
+
+      - name: Build binary
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: "0"
+        run: |
+          set -euo pipefail
+          version="${GITHUB_REF_NAME}"
+          ext=""
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            ext=".exe"
+          fi
+          name="copilot-license-audit-${{ matrix.goos }}-${{ matrix.goarch }}"
+          mkdir -p dist
+          go build -trimpath \
+            -ldflags "-s -w -X main.version=${version}" \
+            -o "dist/${name}${ext}" \
+            ./cmd/copilot-license-audit
+          ( cd dist && sha256sum "${name}${ext}" > "${name}${ext}.sha256" )
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: copilot-license-audit-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: dist/
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Download all build artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "${GITHUB_REF_NAME}" \
+            --title "${GITHUB_REF_NAME}" \
+            --generate-notes \
+            dist/*
